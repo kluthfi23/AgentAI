@@ -1,32 +1,39 @@
 class TaskExecutor:
 
-
-    def execute(self, page, tasks):
+    def execute(self, page, plugin, tasks):
 
         for task in tasks:
 
+            action = task.action
 
-            print(
-                f"[TASK] {task.action}"
-            )
+            data = task.data
 
+            print(f"[EXECUTOR] {action}")
 
-            if task.action == "open":
+            if action == "open":
 
-                url = task.data["url"]
+                plugin.open(
+                    page,
+                    data["url"]
+                )
 
-                if not url.startswith("http"):
+            elif action == "search":
 
-                    url = "https://" + url
+                plugin.search(
+                    page,
+                    data["keyword"]
+                )
 
+            elif action == "screenshot":
 
-                page.goto(url)
+                plugin.screenshot(page)
 
+            elif action == "download":
 
+                plugin.download(page)
 
-            elif task.action == "search":
+            else:
 
                 print(
-                    "Search:",
-                    task.data["keyword"]
+                    f"[WARNING] Unknown action: {action}"
                 )

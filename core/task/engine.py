@@ -3,49 +3,68 @@ from core.task.action import Action
 
 class TaskEngine:
 
-
     def create_task(self, command):
 
         tasks = []
 
+        command = command.lower().strip()
 
-        command = command.lower()
+        # Pisahkan berdasarkan kata "lalu"
+        parts = [p.strip() for p in command.split("lalu")]
 
+        for part in parts:
 
-        if "buka" in command:
+            if part.startswith("buka "):
 
-            tasks.append(
-                Action(
-                    "open",
-                    {
-                        "url": command
-                    }
+                url = part.replace("buka ", "", 1).strip()
+
+                tasks.append(
+                    Action(
+                        "open",
+                        {
+                            "url": url
+                        }
+                    )
                 )
-            )
 
+            elif part.startswith("cari "):
 
-        elif "cari" in command:
+                keyword = part.replace("cari ", "", 1).strip()
 
-            tasks.append(
-                Action(
-                    "search",
-                    {
-                        "keyword": command
-                    }
+                tasks.append(
+                    Action(
+                        "search",
+                        {
+                            "keyword": keyword
+                        }
+                    )
                 )
-            )
 
+            elif "screenshot" in part:
 
-        else:
-
-            tasks.append(
-                Action(
-                    "open",
-                    {
-                        "url": command
-                    }
+                tasks.append(
+                    Action(
+                        "screenshot"
+                    )
                 )
-            )
 
+            elif "download" in part:
+
+                tasks.append(
+                    Action(
+                        "download"
+                    )
+                )
+
+            else:
+
+                tasks.append(
+                    Action(
+                        "unknown",
+                        {
+                            "command": part
+                        }
+                    )
+                )
 
         return tasks

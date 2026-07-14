@@ -1,86 +1,147 @@
 from core.browser.manager import BrowserManager
+from core.task.engine import TaskEngine
+from core.task.executor import TaskExecutor
 from database.database import Database
 from plugins.manager import PluginManager
+
 
 class Worker:
 
     def __init__(self):
 
         self.browser = BrowserManager()
+        self.task_engine = TaskEngine()
+        self.task_executor = TaskExecutor()
 
+    def normalize_url(self, url):
+
+        url = url.strip().lower()
+
+        if not url.startswith("http"):
+
+            if "." not in url:
+                url += ".com"
+
+            url = "https://" + url
+
+        return url
 
     def run(self, job):
 
         db = Database()
 
-        db.update_status(
-    job[0],
-    "Running"
-)
-
-        print(f"\n[AI] Memulai Job #{job[0]}")
-        print(f"[AI] Website : {job[1]}")
-        print(f"[AI] User    : {job[2]}")
+        page = None
 
         try:
 
-            browser = self.browser.start()
+            # ==========================
+            # Update Status -> Running
+            # ==========================
+
+            db.update_status(
+                job[0],
+                "Running"
+            )
+
+            print("\n========================================")
+            print(f"[AI] Menjalankan Job #{job[0]}")
+            print("========================================")
+
+            website = job[1]
+            username = job[2]
+            command = job[3]
+
+            print(f"Website : {website}")
+            print(f"Username: {username}")
+            print(f"Command : {command}")
+
+            url = self.normalize_url(website)
+
+            # ==========================
+            # Browser
+            # ==========================
+
+            self.browser.start()
 
             page = self.browser.new_page()
 
+            # ==========================
+            # Plugin
+            # ==========================
 
-            url = job[1].strip()
+            plugin = PluginManager().load(url)
 
+            # ==========================
+            # Task
+            # ==========================
 
-            if not url.startswith("http"):
-
-                if "." not in url:
-                    url += ".com"
-
-                url = "https://" + url
-
-
-            print(f"[AI] Membuka website: {url}")
-
-
-            page.goto(
-                url,
-                timeout=60000
+            tasks = self.task_engine.create_task(
+                command
             )
 
+            print("\nTask List")
 
-            print("[AI] Website berhasil dibuka")
+            for task in tasks:
 
+                print(task.to_dict())
 
-            page.screenshot(
-                path=f"screenshots/job_{job[0]}.png"
+            # ==========================
+            # Execute Task
+            # ==========================
+
+            self.task_executor.execute(
+                page,
+                plugin,
+                tasks
             )
 
-
-            print(
-                f"[AI] Screenshot tersimpan: job_{job[0]}.png"
-            )
+            # ==========================
+            # Save Session
+            # ==========================
 
             self.browser.save_session()
 
             page.close()
 
+            # ==========================
+            # Update Status -> Selesai
+            # ==========================
+
             db.update_status(
-               job[0],
-               "Selesai"
-)
+                job[0],
+                "Selesai"
+            )
+
+            print("\n[AI] Job selesai")
 
             return True
 
-
         except Exception as e:
 
-            print(
-                f"[ERROR] {e}"
+            print(f"\n[ERROR] {e}")
+
+            # ==========================
+            # Update Status -> Gagal
+            # ==========================
+
+            db.update_status(
+                job[0],
+                "Gagal"
             )
 
             return False
 
+        finally:
+
+            try:
+
+                if page:
+                    page.close()
+
+            except:
+                pass
+
+            db.close()
 
     def close(self):
 

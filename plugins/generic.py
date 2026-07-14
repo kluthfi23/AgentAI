@@ -1,25 +1,38 @@
 class GenericPlugin:
 
-    def run(self, page, job):
-
-        url = job[1].strip()
+    def open(self, page, url):
 
         if not url.startswith("http"):
 
-            if "." not in url:
-                url += ".com"
-
             url = "https://" + url
 
-        print(f"[PLUGIN] Membuka {url}")
+        print(f"[PLUGIN] Open {url}")
 
         page.goto(
             url,
             timeout=60000
         )
 
-        page.screenshot(
-            path=f"screenshots/job_{job[0]}.png"
+
+    def search(self, page, keyword):
+
+        print(
+            f"[PLUGIN] Search {keyword}"
         )
 
-        return True
+        # Placeholder
+        # Nanti kita cari textbox otomatis
+
+
+    def screenshot(self, page):
+
+        page.screenshot(
+            path="screenshots/plugin.png"
+        )
+
+
+    def download(self, page):
+
+        print(
+            "[PLUGIN] Download"
+        )

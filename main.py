@@ -5,7 +5,7 @@ from database.database import Database
 from scheduler.scheduler import Scheduler
 
 import time
-
+from database.migration.migrator import Migrator
 
 def main():
     bot = AgentAI()
@@ -17,7 +17,18 @@ def main():
     db.create_tables()
     db.create_admin()
 
+    migration = Migrator()
+    
+    migration.run()
+
+    migration.close()
+
+
+
     scheduler = Scheduler(db)
+
+    scheduler.start()
+
 
     print("\nAgentAI Scheduler Berjalan...")
 

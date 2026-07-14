@@ -22,6 +22,7 @@ class Database:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             website TEXT NOT NULL,
             username TEXT,
+            command TEXT,
             status TEXT DEFAULT 'Pending',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -55,14 +56,15 @@ class Database:
 
         return self.cursor.fetchone()
 
-    def add_job(self, website, username):
+    def add_job(self, website, username, command):
 
         self.cursor.execute("""
-        INSERT INTO jobs (website, username)
-        VALUES (?, ?)
+        INSERT INTO jobs (website, username, command)
+        VALUES (?, ?, ?)
         """, (
             website,
-            username
+            username,
+            command
         ))
 
         self.conn.commit()
