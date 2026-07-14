@@ -1,7 +1,12 @@
-from playwright.sync_api import sync_playwright
+from core.browser.manager import BrowserManager
 
 
 class Worker:
+
+    def __init__(self):
+
+        self.browser = BrowserManager()
+
 
     def run(self, job):
 
@@ -11,47 +16,59 @@ class Worker:
 
         try:
 
-            with sync_playwright() as p:
+            browser = self.browser.start()
 
-                browser = p.chromium.launch(
-                    headless=False
-                )
+            page = self.browser.new_page()
 
-                page = browser.new_page()
 
-                # Ambil URL
-                url = job[1].strip()
+            url = job[1].strip()
 
-                # Tambahkan https:// jika belum ada
-                if not url.startswith("http"):
 
-                    # Tambahkan .com jika belum ada domain
-                    if "." not in url:
-                        url += ".com"
+            if not url.startswith("http"):
 
-                    url = "https://" + url
+                if "." not in url:
+                    url += ".com"
 
-                print(f"[AI] Membuka website: {url}")
+                url = "https://" + url
 
-                page.goto(
-                    url,
-                    timeout=60000
-                )
 
-                print("[AI] Halaman berhasil dibuka.")
+            print(f"[AI] Membuka website: {url}")
 
-                page.screenshot(
-                    path=f"screenshots/job_{job[0]}.png"
-                )
 
-                browser.close()
+            page.goto(
+                url,
+                timeout=60000
+            )
 
-            print("[AI] Job selesai.\n")
+
+            print("[AI] Website berhasil dibuka")
+
+
+            page.screenshot(
+                path=f"screenshots/job_{job[0]}.png"
+            )
+
+
+            print(
+                f"[AI] Screenshot tersimpan: job_{job[0]}.png"
+            )
+
+
+            page.close()
+
 
             return True
 
+
         except Exception as e:
 
-            print(f"[ERROR] {e}")
+            print(
+                f"[ERROR] {e}"
+            )
 
             return False
+
+
+    def close(self):
+
+        self.browser.close()
