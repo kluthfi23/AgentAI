@@ -53,6 +53,7 @@ class Worker:
                 f"[AI] Screenshot tersimpan: job_{job[0]}.png"
             )
 
+            self.browser.save_session()
 
             page.close()
 
