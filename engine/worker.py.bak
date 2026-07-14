@@ -1,0 +1,27 @@
+import time
+
+
+class Worker:
+
+    def run(self, job):
+
+        job_id = job[0]
+        website = job[1]
+
+        print(f"[AI] Memulai Job #{job_id}")
+
+        print(f"[AI] Membuka {website}")
+        time.sleep(2)
+
+        print("[AI] Analisa halaman...")
+        time.sleep(2)
+
+        print("[AI] Mengisi Form...")
+        time.sleep(2)
+
+        print("[AI] Submit...")
+        time.sleep(2)
+
+        print(f"[AI] Job #{job_id} selesai\n")
+       
+        return True

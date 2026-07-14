@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+
+    <div>
+        <h1>🤖 AgentAI Dashboard</h1>
+        <p>
+            Login sebagai:
+            <b>{{ username }}</b>
+        </p>
+    </div>
+
+    <a href="/logout"
+       style="
+       background:#dc3545;
+       color:white;
+       padding:10px 15px;
+       text-decoration:none;
+       border-radius:6px;">
+       Logout
+    </a>
+
+</div>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+
+        body{
+            font-family: Arial, sans-serif;
+            padding:20px;
+            background:#f5f5f5;
+        }
+
+        h1{
+            margin-bottom:20px;
+        }
+
+        .stats{
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+            margin-bottom:20px;
+        }
+
+        .stat-card{
+            background:white;
+            padding:15px;
+            border-radius:10px;
+            min-width:110px;
+            text-align:center;
+            box-shadow:0 2px 5px rgba(0,0,0,.1);
+        }
+
+        .stat-card h2{
+            margin:0;
+        }
+
+        .card{
+            background:white;
+            padding:20px;
+            border-radius:10px;
+            margin-bottom:20px;
+            box-shadow:0 2px 5px rgba(0,0,0,.1);
+        }
+
+        input{
+            width:100%;
+            padding:12px;
+            margin-bottom:10px;
+            box-sizing:border-box;
+        }
+
+        button{
+            border:none;
+            padding:12px 16px;
+            border-radius:6px;
+            cursor:pointer;
+        }
+
+        .btn-add{
+            background:#28a745;
+            color:white;
+        }
+
+        .btn-delete{
+            background:#dc3545;
+            color:white;
+            padding:8px 12px;
+            text-decoration:none;
+            border-radius:6px;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            background:white;
+        }
+
+        th, td{
+            border:1px solid #ddd;
+            padding:10px;
+            text-align:left;
+        }
+
+        th{
+            background:#f0f0f0;
+        }
+
+        .pending{
+            color:orange;
+            font-weight:bold;
+        }
+
+        .running{
+            color:blue;
+            font-weight:bold;
+        }
+
+        .selesai{
+            color:green;
+            font-weight:bold;
+        }
+
+        .gagal{
+            color:red;
+            font-weight:bold;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<h1>🤖 AgentAI Dashboard</h1>
+
+<div class="stats">
+
+    <div class="stat-card">
+        <h2>{{ total }}</h2>
+        <p>Total Job</p>
+    </div>
+
+    <div class="stat-card">
+        <h2>{{ pending }}</h2>
+        <p>Pending</p>
+    </div>
+
+    <div class="stat-card">
+        <h2>{{ running }}</h2>
+        <p>Running</p>
+    </div>
+
+    <div class="stat-card">
+        <h2>{{ selesai }}</h2>
+        <p>Selesai</p>
+    </div>
+
+    <div class="stat-card">
+        <h2>{{ gagal }}</h2>
+        <p>Gagal</p>
+    </div>
+
+</div>
+
+<div class="card">
+
+    <h2>Tambah Job</h2>
+
+    <form action="/add" method="post">
+
+        <input
+            type="text"
+            name="website"
+            placeholder="Website"
+            required>
+
+        <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            required>
+
+        <button
+            type="submit"
+            class="btn-add">
+            Tambah Job
+        </button>
+
+    </form>
+
+</div>
+
+<div class="card">
+<form method="get">
+
+    <input
+        type="text"
+        name="q"
+        placeholder="Cari website..."
+        value="{{ keyword }}">
+
+    <button type="submit">
+        Cari
+    </button>
+
+</form>
+
+<br>
+
+    <h2>Daftar Job</h2>
+
+    <table>
+
+        <tr>
+            <th>ID</th>
+            <th>Website</th>
+            <th>User</th>
+            <th>Status</th>
+            <th>Aksi</th>
+        </tr>
+
+        {% for job in jobs %}
+
+        <tr>
+
+            <td>{{ job[0] }}</td>
+
+            <td>{{ job[1] }}</td>
+
+            <td>{{ job[2] }}</td>
+
+            <td>
+
+                {% if job[3] == "Pending" %}
+                    <span class="pending">Pending</span>
+
+                {% elif job[3] == "Running" %}
+                    <span class="running">Running</span>
+
+                {% elif job[3] == "Selesai" %}
+                    <span class="selesai">Selesai</span>
+
+                {% else %}
+                    <span class="gagal">Gagal</span>
+                {% endif %}
+
+            </td>
+
+            <td>
+                <a
+                    href="/delete/{{ job[0] }}"
+                    class="btn-delete">
+                    Hapus
+                </a>
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</div>
+
+</body>
+</html>
