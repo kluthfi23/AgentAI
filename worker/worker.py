@@ -1,5 +1,6 @@
 from core.browser.manager import BrowserManager
-
+from database.database import Database
+from plugins.manager import PluginManager
 
 class Worker:
 
@@ -9,6 +10,13 @@ class Worker:
 
 
     def run(self, job):
+
+        db = Database()
+
+        db.update_status(
+    job[0],
+    "Running"
+)
 
         print(f"\n[AI] Memulai Job #{job[0]}")
         print(f"[AI] Website : {job[1]}")
@@ -57,6 +65,10 @@ class Worker:
 
             page.close()
 
+            db.update_status(
+               job[0],
+               "Selesai"
+)
 
             return True
 
